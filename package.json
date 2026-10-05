@@ -1,0 +1,19 @@
+{
+  "name": "hiatari-simulator",
+  "private": true,
+  "version": "0.1.0",
+  "description": "住宅の日当たり・日射取得シミュレーター",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4",
+    "three": "^0.186.1"
+  },
+  "devDependencies": {
+    "vite": "^8.3.2"
+  }
+}

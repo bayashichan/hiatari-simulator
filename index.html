@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>日当たりシミュレーター</title>
+    <meta name="description" content="住宅の軒・屋根・窓・樹木・隣家を入力し、任意の日付の日当たりと日射取得をシミュレーションします。" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='7' fill='%23f59e0b'/%3E%3Cg stroke='%23f59e0b' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M16 2v4M16 26v4M2 16h4M26 16h4M6 6l3 3M23 23l3 3M6 26l3-3M23 9l3-3'/%3E%3C/g%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo" aria-hidden="true"></span>
+        <div>
+          <h1>日当たりシミュレーター</h1>
+          <p>住宅の日照・日射取得の検討</p>
+        </div>
+      </div>
+
+      <div class="when">
+        <button id="prevDay" class="icon-btn" title="前日">‹</button>
+        <input type="date" id="date" aria-label="日付" />
+        <button id="nextDay" class="icon-btn" title="翌日">›</button>
+        <div class="seg" id="presets" role="group" aria-label="代表日">
+          <button data-p="winter">冬至</button>
+          <button data-p="vernal">春分</button>
+          <button data-p="summer">夏至</button>
+          <button data-p="autumnal">秋分</button>
+          <button data-p="today">今日</button>
+        </div>
+      </div>
+
+      <div class="clock">
+        <button id="play" class="icon-btn play" title="再生">▶</button>
+        <input type="range" id="time" min="0" max="1440" step="5" aria-label="時刻" />
+        <output id="timeLabel">12:00</output>
+        <select id="speed" aria-label="再生速度" title="再生速度">
+          <option value="30">ゆっくり</option>
+          <option value="60" selected>標準</option>
+          <option value="150">速い</option>
+        </select>
+      </div>
+
+      <div class="readout" id="readout"></div>
+    </header>
+
+    <div class="layout">
+      <aside class="sidebar" id="sidebar" aria-label="入力"></aside>
+
+      <main class="main" id="main">
+        <section class="card v3d">
+          <div class="card-head">
+            <h2>3Dビュー</h2>
+            <div class="btns">
+              <button data-view="bird">俯瞰</button>
+              <button data-view="south">南から</button>
+              <button data-view="top">真上</button>
+              <button data-view="sun" title="太陽の位置から見た図。見えている面＝日が当たっている面">太陽から</button>
+              <button id="snap" title="現在の3DビューをPNG画像で保存">画像保存</button>
+            </div>
+          </div>
+          <div id="view3d" class="view3d"></div>
+          <p class="hint">ドラッグで回転・右ドラッグで移動・ホイールで拡大縮小。オレンジの線は選択日の太陽の通り道。</p>
+        </section>
+
+        <section class="card plan">
+          <div class="card-head">
+            <h2>配置図</h2>
+            <div class="btns">
+              <select id="overlay" aria-label="配置図の表示">
+                <option value="shadow">現在時刻の影</option>
+                <option value="hours">1日の日照時間マップ</option>
+                <option value="none">表示なし</option>
+              </select>
+              <button id="fitPlan">全体表示</button>
+            </div>
+          </div>
+          <div class="plan-wrap">
+            <canvas id="plan"></canvas>
+            <div id="mapProgress" class="progress" hidden><div></div></div>
+          </div>
+          <p class="hint">樹木・障害物はドラッグで移動できます。建物内の黄色は、窓から床に差し込む日だまり（現在時刻）。</p>
+        </section>
+
+        <section class="card results">
+          <div class="card-head">
+            <h2>窓ごとの日当たり <span id="resultDate" class="sub"></span></h2>
+            <div class="btns"><button id="csv">CSV保存</button></div>
+          </div>
+          <div class="table-wrap"><table id="winTable"></table></div>
+          <h3>時刻別の日当たり <small>（セルにマウスを重ねると詳細、クリックでその時刻へ）</small></h3>
+          <div class="timeline-wrap"><canvas id="timeline"></canvas></div>
+          <div class="legend" id="tlLegend"></div>
+        </section>
+
+        <section class="card sunpath">
+          <div class="card-head"><h2>太陽位置図</h2></div>
+          <div class="sunpath-wrap"><canvas id="sunpath"></canvas></div>
+          <div class="legend" id="sunpathLegend"></div>
+          <dl class="suninfo" id="sunInfo"></dl>
+        </section>
+
+        <section class="card year">
+          <div class="card-head">
+            <h2>月別の比較 <span class="sub">各月21日・晴天時</span></h2>
+            <div class="btns">
+              <select id="yearMetric" aria-label="指標">
+                <option value="gain">日射熱取得量（kWh/日）</option>
+                <option value="effH">有効日照時間（h）</option>
+              </select>
+            </div>
+          </div>
+          <div class="year-wrap"><canvas id="year"></canvas></div>
+          <div class="legend" id="yearLegend"></div>
+          <p class="hint">軒や庇は、夏の高い日射を遮り冬の低い日射を取り込むのが理想です。グラフ上をクリックするとその月の21日に移動します。</p>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
