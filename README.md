@@ -3,9 +3,13 @@
 住宅の **軒・屋根・高さ・外壁・窓（サイズ・位置）・庇・樹木・隣家** などを入力し、敷地の緯度経度から
 **任意の日付（冬至・夏至・春分・秋分など）の日当たりと日射取得** をシミュレーションする Web アプリです。
 
-## 起動方法
+**▶ すぐに使う：https://bayashichan.github.io/hiatari-simulator/**
 
-Node.js（v18 以上）が必要です。
+（インストール不要。入力内容は使っているブラウザの中にだけ保存されます）
+
+## 手元で動かす
+
+Node.js（v20.19 以上、推奨 v22）が必要です。
 
 ```bash
 npm install
@@ -14,11 +18,13 @@ npm run dev
 
 ブラウザで http://localhost:5173 を開きます。
 
-配布用ファイルの作成（`dist/` に出力。任意の Web サーバーや GitHub Pages に置けます）:
+配布用ファイルの作成（`dist/` に出力。任意の Web サーバーに置けます）:
 
 ```bash
 npm run build
 ```
+
+`main` ブランチに push すると、GitHub Actions（`.github/workflows/deploy.yml`）が自動でビルドし GitHub Pages を更新します。
 
 ## 主な機能
 
